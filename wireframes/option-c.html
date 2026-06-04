@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wireframe — Option C: Inspection Checklist Form</title>
+<style>
+  body { font-family: monospace; background: #f5f5f5; padding: 24px; }
+  .frame { border: 2px dashed #888; background: #fff; max-width: 560px; padding: 16px; margin-bottom: 24px; }
+  h1 { font-size: 16px; border-bottom: 1px solid #ccc; padding-bottom: 8px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #aaa; padding: 6px 10px; font-size: 13px; text-align: left; }
+  th { background: #eee; }
+  input[type=text] { font-family: monospace; width: 160px; }
+  button { font-family: monospace; padding: 4px 14px; margin-top: 12px; }
+  .note { color: #777; font-size: 12px; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <h1>New Inspection</h1>
+
+  <p>
+    Inspector: <input type="text" placeholder="tran.thi.b"> &nbsp;
+    Lot No: <input type="text" placeholder="LOT-0042">
+  </p>
+
+  <table>
+    <tr><th>Item</th><th>Result</th></tr>
+    <tr><td>Stitching quality</td><td><label><input type="radio" name="i1"> Pass</label> <label><input type="radio" name="i1"> Fail</label></td></tr>
+    <tr><td>Measurement within tolerance</td><td><label><input type="radio" name="i2"> Pass</label> <label><input type="radio" name="i2"> Fail</label></td></tr>
+    <tr><td>Fabric defects</td><td><label><input type="radio" name="i3"> Pass</label> <label><input type="radio" name="i3"> Fail</label></td></tr>
+    <tr><td>Label and tag placement</td><td><label><input type="radio" name="i4"> Pass</label> <label><input type="radio" name="i4"> Fail</label></td></tr>
+    <tr><td>Packing condition</td><td><label><input type="radio" name="i5"> Pass</label> <label><input type="radio" name="i5"> Fail</label></td></tr>
+  </table>
+
+  <button>Submit Inspection</button>
+
+  <p class="note">
+    Sketch only — not a design spec.<br>
+    * Items loaded from GET /checklist-items<br>
+    * Submit → POST /inspections (every item must be answered)
+  </p>
+</div>
+
+<div class="frame">
+  <h1>History</h1>
+  <p>Date: <input type="text" placeholder="2026-06-04"> <button>Search</button></p>
+  <table>
+    <tr><th>Time</th><th>Lot</th><th>Inspector</th><th>Overall</th></tr>
+    <tr><td>10:32</td><td>LOT-0042</td><td>tran.thi.b</td><td>FAIL</td></tr>
+    <tr><td>09:15</td><td>LOT-0041</td><td>tran.thi.b</td><td>PASS</td></tr>
+  </table>
+  <p class="note">* GET /inspections?date=YYYY-MM-DD, newest first</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Wireframe — Option B: Work Order Screen</title>
+<style>
+  body { font-family: monospace; background: #f5f5f5; padding: 24px; }
+  .frame { border: 2px dashed #888; background: #fff; max-width: 720px; padding: 16px; }
+  h1 { font-size: 16px; border-bottom: 1px solid #ccc; padding-bottom: 8px; }
+  .toolbar { margin: 12px 0; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #aaa; padding: 6px 10px; font-size: 13px; text-align: left; }
+  th { background: #eee; }
+  button { font-family: monospace; padding: 3px 10px; }
+  .note { color: #777; font-size: 12px; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <h1>Work Orders</h1>
+
+  <div class="toolbar">
+    Filter:
+    <select>
+      <option>ALL</option>
+      <option>PENDING</option>
+      <option>IN_PROGRESS</option>
+      <option>COMPLETED</option>
+    </select>
+  </div>
+
+  <table>
+    <tr><th>Order No</th><th>Style</th><th>Qty</th><th>Status</th><th>Action</th></tr>
+    <tr><td>WO-2026-0001</td><td>ST-100</td><td>500</td><td>PENDING</td><td><button>Start</button></td></tr>
+    <tr><td>WO-2026-0002</td><td>ST-204</td><td>1200</td><td>IN_PROGRESS</td><td><button>Complete</button></td></tr>
+    <tr><td>WO-2026-0003</td><td>ST-100</td><td>300</td><td>COMPLETED</td><td>—</td></tr>
+  </table>
+
+  <p class="note">
+    Sketch only — not a design spec.<br>
+    * Filter dropdown calls GET /work-orders?status=…<br>
+    * [Start] → PATCH status IN_PROGRESS, [Complete] → PATCH status COMPLETED<br>
+    * COMPLETED rows have no action
+  </p>
+</div>
+</body>
+</html>
