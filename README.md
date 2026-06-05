@@ -12,6 +12,17 @@ the full Claude Code workflow you learned in Days 1–4.
 | 4   | Custom command + sub-agent + MCP (starter templates) | [day4_repository](https://github.com/yic-mes/day4_repository) |
 | 5   | Capstone mini project (Option A/B/C specs) | this repo |
 
+## Prerequisites
+
+- No code from previous days is required — you fork this repo and build from
+  scratch.
+- The mandatory workflow uses your `/review` command and `test-writer`
+  sub-agent from Day 4. Bring your improved versions — or, if you skipped
+  Day 4, copy the starter templates from
+  [day4_repository](https://github.com/yic-mes/day4_repository) into
+  `.claude/` of your fork.
+- Node.js 18+, npm 9+, Claude Code installed and logged in
+
 ## Choose one scenario
 
 | Option | Scenario | Spec |
