@@ -3,6 +3,15 @@
 Fork this repository and build **one** of the three mini MES scenarios using
 the full Claude Code workflow you learned in Days 1–4.
 
+## Curriculum repositories
+
+| Day | Lab | Repository |
+| --- | --- | ---------- |
+| 1–2 | Sample CRUD app (`/healthz`, CLAUDE.md, `/products`) | [day1_repository](https://github.com/yic-mes/day1_repository) |
+| 3   | Brownfield refactor (legacy module) | [day3_repository](https://github.com/yic-mes/day3_repository) |
+| 4   | Custom command + sub-agent + MCP (starter templates) | [day4_repository](https://github.com/yic-mes/day4_repository) |
+| 5   | Capstone mini project (Option A/B/C specs) | this repo |
+
 ## Choose one scenario
 
 | Option | Scenario | Spec |
