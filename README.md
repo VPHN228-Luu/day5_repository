@@ -68,3 +68,26 @@ SQLite schemas are in [`schema/`](schema/), wireframe sketches for B and C in
   terminal
 - **Final retrospective (~1 page)** — top 3 lessons, top 3 mistakes (and
   recovery), biggest unresolved question about Claude Code
+
+## Implementation (this fork — Option B: Work Order Screen)
+
+Built following the mandatory workflow. Plan is in [`PLAN.md`](PLAN.md); scenario
+rules in [`CLAUDE.md`](CLAUDE.md). Stack: Express + better-sqlite3 + Jest/supertest.
+
+```bash
+npm install      # install dependencies
+npm test         # run the Jest suite (48 tests: validation, filter, transitions, 404/409)
+npm start        # serve API + screen at http://localhost:3000
+```
+
+- API: `POST /work-orders`, `GET /work-orders?status=`, `PATCH /work-orders/:id/status`.
+- Screen: open `http://localhost:3000/` — filterable table with Start/Complete buttons.
+- DB file path is configurable via `DB_PATH` (default `data.db`, gitignored); tests use `:memory:`.
+
+Acceptance checklist (Option B) — all verified by tests and an end-to-end curl pass:
+
+- [x] Create / list / filter by status all work
+- [x] Status transitions enforced (no skipping, no going backward)
+- [x] Duplicate `order_no` rejected with 409
+- [x] Screen shows the list, filters, and toggles status via the API
+- [x] All endpoints covered by Jest tests (happy path + validation + transitions)
