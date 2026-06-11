@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Work Orders</title>
+<style>
+  body { font-family: monospace; background: #f5f5f5; padding: 24px; }
+  .frame { border: 1px solid #ccc; background: #fff; max-width: 760px; padding: 16px; border-radius: 4px; }
+  h1 { font-size: 18px; border-bottom: 1px solid #ccc; padding-bottom: 8px; margin-top: 0; }
+  .toolbar { margin: 12px 0; display: flex; gap: 8px; align-items: center; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { border: 1px solid #ccc; padding: 6px 10px; font-size: 13px; text-align: left; }
+  th { background: #eee; }
+  button { font-family: monospace; padding: 3px 12px; cursor: pointer; }
+  .status { font-weight: bold; }
+  .PENDING { color: #b26a00; }
+  .IN_PROGRESS { color: #1565c0; }
+  .COMPLETED { color: #2e7d32; }
+  .msg { min-height: 18px; font-size: 12px; color: #777; margin-top: 8px; }
+  .msg.error { color: #c62828; }
+  details { margin-top: 16px; }
+  form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+  input { font-family: monospace; padding: 3px 6px; }
+</style>
+</head>
+<body>
+<div class="frame">
+  <h1>Work Orders</h1>
+
+  <div class="toolbar">
+    <label for="filter">Filter:</label>
+    <select id="filter">
+      <option value="ALL">ALL</option>
+      <option value="PENDING">PENDING</option>
+      <option value="IN_PROGRESS">IN_PROGRESS</option>
+      <option value="COMPLETED">COMPLETED</option>
+    </select>
+    <button id="refresh" type="button">Refresh</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Order No</th><th>Style</th><th>Qty</th><th>Status</th><th>Action</th></tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <div id="msg" class="msg"></div>
+
+  <details>
+    <summary>New work order</summary>
+    <form id="create-form">
+      <input id="order_no" placeholder="WO-2026-0001" size="14" required>
+      <input id="style_code" placeholder="ST-100" size="10" required>
+      <input id="qty" type="number" placeholder="qty" min="1" max="100000" required>
+      <button type="submit">Create</button>
+    </form>
+  </details>
+</div>
+
+<script>
+  const tbody = document.getElementById('rows');
+  const filter = document.getElementById('filter');
+  const msgEl = document.getElementById('msg');
+
+  // Each status maps to the next action available on a row.
+  const NEXT = { PENDING: 'IN_PROGRESS', IN_PROGRESS: 'COMPLETED', COMPLETED: null };
+  const LABEL = { IN_PROGRESS: 'Start', COMPLETED: 'Complete' };
+
+  function setMsg(text, isError) {
+    msgEl.textContent = text || '';
+    msgEl.classList.toggle('error', !!isError);
+  }
+
+  // Escape user-controlled values before they go into innerHTML (order_no /
+  // style_code are free-form at POST time) to avoid stored XSS.
+  function esc(value) {
+    const div = document.createElement('div');
+    div.textContent = String(value);
+    return div.innerHTML;
+  }
+
+  function actionCell(wo) {
+    const next = NEXT[wo.status];
+    if (!next) return '—';
+    return `<button type="button" data-id="${wo.id}" data-next="${next}">${LABEL[next]}</button>`;
+  }
+
+  function render(list) {
+    if (!list.length) {
+      tbody.innerHTML = '<tr><td colspan="5">No work orders.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map((wo) => `
+      <tr>
+        <td>${esc(wo.order_no)}</td>
+        <td>${esc(wo.style_code)}</td>
+        <td>${esc(wo.qty)}</td>
+        <td class="status ${esc(wo.status)}">${esc(wo.status)}</td>
+        <td>${actionCell(wo)}</td>
+      </tr>`).join('');
+  }
+
+  async function load() {
+    const status = filter.value;
+    const url = status === 'ALL' ? '/work-orders' : `/work-orders?status=${status}`;
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to load');
+      render(data);
+      setMsg(`${data.length} work order(s).`);
+    } catch (err) {
+      setMsg(err.message, true);
+    }
+  }
+
+  async function advance(id, next) {
+    try {
+      const res = await fetch(`/work-orders/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: next }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Transition failed');
+      await load();
+    } catch (err) {
+      setMsg(err.message, true);
+    }
+  }
+
+  tbody.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-id]');
+    if (btn) advance(btn.dataset.id, btn.dataset.next);
+  });
+
+  filter.addEventListener('change', load);
+  document.getElementById('refresh').addEventListener('click', load);
+
+  document.getElementById('create-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const body = {
+      order_no: document.getElementById('order_no').value.trim(),
+      style_code: document.getElementById('style_code').value.trim(),
+      qty: Number(document.getElementById('qty').value),
+    };
+    try {
+      const res = await fetch('/work-orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Create failed');
+      e.target.reset();
+      await load();
+      setMsg(`Created ${data.order_no}.`);
+    } catch (err) {
+      setMsg(err.message, true);
+    }
+  });
+
+  load();
+</script>
+</body>
+</html>
